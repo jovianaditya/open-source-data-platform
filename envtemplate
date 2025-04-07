@@ -1,0 +1,33 @@
+# POSTGRES HIVE METASTORE
+POSTGRES_DB=xxxxxxxxx
+POSTGRES_USER=xxxxxxxxx
+POSTGRES_PASSWORD=xxxxxxxxx
+
+# POSTGRES AIRFLOW
+POSTGRES_DB_AIRFLOW=xxxxxxxxx
+POSTGRES_USER_AIRFLOW=xxxxxxxxx
+POSTGRES_PASSWORD_AIRFLOW=xxxxxxxxx
+
+# POSTGRES METABASE
+POSTGRES_DB_MB=xxxxxxxxx
+POSTGRES_USER_MB=xxxxxxxxx
+POSTGRES_PASSWORD_MB=xxxxxxxxx
+
+# Minio
+MINIO_ROOT_USER=xxxxxxxxx
+MINIO_ROOT_PASSWORD=xxxxxxxxx
+MINIO_ACCESS_KEY=xxxxxxxxx
+MINIO_SECRET_KEY=xxxxxxxxx
+
+# AIRFLOW
+AIRFLOW_UID=50000
+AIRFLOW_GID=0
+AIRFLOW_IMAGE_NAME=apache/airflow:2.10.4
+AIRFLOW_PROJ_DIR=xxxxxxxxx
+
+# Web UI credentials (optional - defaults to airflow/airflow if not set)
+_AIRFLOW_WWW_USER_USERNAME=xxxxxxxxx
+_AIRFLOW_WWW_USER_PASSWORD=xxxxxxxxx
+
+# GitLab
+GITLAB_HOME=xxxxxxxxx
