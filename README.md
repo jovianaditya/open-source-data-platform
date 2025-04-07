@@ -41,7 +41,31 @@ Beside using dbt Trino, we can also extract SQL Server table (need to install OD
 ![image](https://github.com/user-attachments/assets/7fc081e9-437a-413d-ac93-344f3f5a93af)
 ![image](https://github.com/user-attachments/assets/19c0bffc-67cf-49c5-b35a-b59de91c8b63)
 
+## Airflow
+In this project, I'm trying to implement production scenario using CeleryExecutor airflow instead of Sequential (single node executor). 
+![image](https://github.com/user-attachments/assets/005d64d1-cb4d-43ef-999e-ef4549a5e08c)
 
+**How It Works (Using CeleryExecutor in Airflow)**
+
+1. The **Airflow Scheduler** assigns tasks to the **CeleryExecutor**.
+2. The **CeleryExecutor** pushes tasks into a queue (e.g., Redis, RabbitMQ).
+3. **Multiple Celery Workers** pick up and execute the tasks in parallel.
+4. The workers then report the task status back to Airflow.
+
+**This is a simple DAG, to run my python script that extract sql server table and convert it into parquet using DuckDB**
+![image](https://github.com/user-attachments/assets/70f60dc5-f868-459f-9f04-e6f5b3dd7b98)
+
+**Before start your scheduler, you need to add the connection in the Admin section to minio and sql server:**
+![image](https://github.com/user-attachments/assets/93efe9f7-7ee7-45a3-8c72-9c5fe9647f6e)
+![image](https://github.com/user-attachments/assets/946dad7d-7426-47bc-a25e-43b45933e395)
+![image](https://github.com/user-attachments/assets/75d1d236-d986-4324-ba6a-a90391b0743e)
+
+**DAG content:**
+![image](https://github.com/user-attachments/assets/74907590-0567-4e76-9676-6293b26f3d60)
+![image](https://github.com/user-attachments/assets/4b94f45f-7bdd-4b9d-85ac-9a54f44c2a28)
+
+**Check the parquet file in minio:**
+![image](https://github.com/user-attachments/assets/5a95ecdb-75a2-4fa3-91e5-b857e5804a8f)
 
 ## Metabase
 ![image (7)](https://github.com/user-attachments/assets/ccc86b7b-2255-47fe-979c-1076d7230de8)
