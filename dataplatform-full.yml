@@ -1,6 +1,9 @@
 x-airflow-common: &airflow-common
   image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.4}
-  environment: &airflow-common-environment
+  build:
+    context: ./data/airflow
+    dockerfile: Dockerfile
+  environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres-airflow/airflow
@@ -25,9 +28,9 @@ services:
     container_name: postgres-airflow
     image: postgres:13
     environment:
-      POSTGRES_DB: airflow
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: ${POSTGRES_DB_AIRFLOW}
+      POSTGRES_USER: ${POSTGRES_USER_AIRFLOW}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_AIRFLOW}
     volumes:
       - postgres-airflow:/var/lib/postgresql/data
     ports:
@@ -96,7 +99,7 @@ services:
       retries: 5
       start_period: 30s
     environment:
-      <<: *airflow-common-environment
+      <<: *airflow-common-env
       # Required to handle warm shutdown of the celery workers properly
       # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
       DUMB_INIT_SETSID: "0"
@@ -177,7 +180,7 @@ services:
         exec /entrypoint airflow version
     # yamllint enable rule:line-length
     environment:
-      <<: *airflow-common-environment
+      <<: *airflow-common-env
       _AIRFLOW_DB_MIGRATE: 'true'
       _AIRFLOW_WWW_USER_CREATE: 'true'
       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
@@ -193,7 +196,7 @@ services:
     profiles:
       - debug
     environment:
-      <<: *airflow-common-environment
+      <<: *airflow-common-env
       CONNECTION_CHECK_MAX_COUNT: "0"
     # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
     command:
@@ -208,8 +211,9 @@ services:
     <<: *airflow-common
     container_name: flower
     command: celery flower
-    profiles:
-      - flower
+    # if you dont want to start flower when up docker compose activate the profiles section
+    # profiles:
+    #   - flower
     ports:
       - "5555:5555"
     healthcheck:
@@ -244,9 +248,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: metastore
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres-metastore:/var/lib/postgresql/data
     restart: always
@@ -263,10 +267,10 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
     command: server --console-address ":9001" /data
     volumes:
       - minio:/data
@@ -383,6 +387,56 @@ services:
       timeout: 5s
       retries: 5
     restart: always
+
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    restart: unless-stopped
+    hostname: 'gitlab.local'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        # Add any other gitlab.rb configuration here, each on its own line
+        external_url 'http://gitlab.local'
+        # For container registry
+        registry_external_url 'http://registry.gitlab.local:5050'  # Registry domain
+        registry_nginx['enable'] = true
+        gitlab_rails['registry_enabled'] = true
+    ports:
+      - '80:80'
+      - '443:443'
+      - '22:22'
+      - '5050:5050'  # Registry port
+    volumes:
+      - '$GITLAB_HOME/config:/etc/gitlab'
+      - '$GITLAB_HOME/logs:/var/log/gitlab'
+      - '$GITLAB_HOME/data:/var/opt/gitlab'
+      - '$GITLAB_HOME/registry:/var/opt/gitlab/registry'
+    shm_size: '1g'
+
+  # gitlab-runner:
+  #   image: gitlab/gitlab-runner:alpine
+  #   container_name: gitlab-runner
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - "./data/gitlab/gitlab-runner:/etc/gitlab-runner"
+  #   healthcheck:
+  #     test: ["CMD", "pgrep", "gitlab-runner"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+
+  # git-sync:
+  #   image: databurst/git-sync:latest
+  #   volumes:
+  #     - ./project_data:${DESTINATION_PATH:-/app/sync}
+  #     - ${GIT_SSH_KEY:-~/.ssh/id_ed25519}:/root/.ssh/id_ed25519
+  #   environment:
+  #     REPO_URL: ${REPO_URL:-git@github.com:data-burst/airflow-git-sync.git}
+  #     GIT_BRANCH: ${GIT_BRANCH:-main}
+  #     DIRECTORY_NAME: ${DIRECTORY_NAME:-dags}  # Sync repo into "dags" folder
+  #     DESTINATION_PATH: ${DESTINATION_PATH:-/opt/airflow/dags}  # Airflow DAGs folder
+  #     INTERVAL: ${INTERVAL:-10}
 
 volumes:
   postgres-metastore:
