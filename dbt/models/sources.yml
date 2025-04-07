@@ -1,0 +1,29 @@
+version: 2
+sources:
+  - name: sql_server_sales
+    catalog: sqlserver
+    schema: Sales
+    tables:
+      - name: SalesOrderHeader
+      - name: SalesOrderDetail
+      - name: SalesTerritory
+      - name: Customer
+      - name: Store
+
+  - name: sql_server_production
+    catalog: sqlserver
+    schema: Production
+    tables:
+      - name: Product
+      - name: ProductCategory
+      - name: ProductSubCategory
+      - name: ProductModel
+      - name: ProductModelProductDescriptionCulture
+      - name: ProductDescription
+
+  - name: sql_server_person
+    catalog: sqlserver
+    schema: Person
+    tables:
+      - name: CountryRegion
+      - name: StateProvince

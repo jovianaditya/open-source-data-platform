@@ -1,0 +1,40 @@
+name: 'project_platform'
+version: '0.1'
+config-version: 2  # Updated to config version 2
+
+profile: 'dbt_trino'
+
+# Define paths for dbt resources
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+analysis-paths: ["analysis"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+docs-paths: ["docs"]
+asset-paths: ["assets"]
+
+# Target directory for compiled SQL and clean targets
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_modules"
+  - "logs"
+
+# Model-specific configurations
+models:
+    bronze:
+      +schema: bronze
+      +materialized: table
+    silver:
+      +schema: silver
+      +materialized: table
+    gold:
+      +schema: gold
+      +materialized: table
+
+# Required for Trino
+quoting:
+  database: false  # Catalogs don't need quoting
+  schema: true     # Quote schema names to handle case sensitivity
+  identifier: true # Quote table and column names for case sensitivity

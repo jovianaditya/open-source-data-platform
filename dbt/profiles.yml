@@ -1,0 +1,32 @@
+dbt_trino:
+  target: dev
+  outputs:
+    dev:
+    # Iceberg Connection
+      type: trino
+      method: ldap  # Change to ldap since we're using password authentication
+      user: trinoadmin
+      password: trinoadmin  # Replace with your actual password
+      host: trino
+      port: 8443
+      catalog: iceberg
+      schema: bronze
+      threads: 4
+      http_scheme: https
+      verify: False
+      ssl_verify: False
+
+    # SQL Server Connection
+    sql_server:
+      type: trino
+      method: ldap
+      user: trinoadmin
+      password: trinoadmin  # Replace with your actual password
+      host: trino
+      port: 8443
+      catalog: sqlserver  # This matches the catalog name you configured in Trino
+      schema: bronze  # Replace with your schema name
+      threads: 4
+      http_scheme: https
+      verify: False
+      ssl_verify: False
