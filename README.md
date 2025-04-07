@@ -67,6 +67,14 @@ In this project, I'm trying to implement a production scenario using CeleryExecu
 **Check the parquet file in minio:**
 ![image](https://github.com/user-attachments/assets/5a95ecdb-75a2-4fa3-91e5-b857e5804a8f)
 
+You can also access Flower through web-server for:
+* Task Monitoring: You can see the real-time status of tasks, including whether they are queued, started, or finished.
+* Worker Monitoring: View the status of workers, their load, and task completion times.
+* Real-Time Events: See detailed logs of events such as task failures or retries.
+* Performance Metrics: Monitor various performance metrics related to your Celery workers.
+* 
+![image](https://github.com/user-attachments/assets/8b0afd2a-f757-415e-94e7-24e1fdd6adfd)
+
 ## **Metabase**
 ![image (7)](https://github.com/user-attachments/assets/ccc86b7b-2255-47fe-979c-1076d7230de8)
 
