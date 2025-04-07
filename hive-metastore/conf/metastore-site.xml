@@ -36,11 +36,11 @@
     </property>
     <property>
         <name>fs.s3a.access.key</name>
-        <value>minioadmin</value>
+        <value>xxxxxxxxx</value>
     </property>
     <property>
         <name>fs.s3a.secret.key</name>
-        <value>minioadmin</value>
+        <value>xxxxxxxxxxx</value>
     </property>
     <property>
         <name>fs.s3a.endpoint</name>
