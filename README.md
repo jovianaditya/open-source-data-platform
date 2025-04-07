@@ -36,3 +36,36 @@ Check if dbt works with trying to extract sql server tables and sink it into ice
 Check table in DBeaver:
 ![image (6)](https://github.com/user-attachments/assets/dadac6ac-33bb-4ff7-9dae-8868c1947501)
 
+## Metabase
+![image (7)](https://github.com/user-attachments/assets/ccc86b7b-2255-47fe-979c-1076d7230de8)
+
+Actually, Trino is not a database but an execution engine. But Metabase can connect to tables from Trino because it exposes table metadata over the JDBC connection.
+To connect Metabase to Trino, you need to install Starburst driver first and mount it into /plugins directory inside the Metabase container. https://github.com/starburstdata/metabase-driver/releases/download/6.1.0/starburst-6.1.0.metabase-driver.jar
+
+After running the container, access http://localhost:3000. For the first time, you will need to input several information for Metabase credentials, and then you can add a database connection to the Metabase:
+![image (8)](https://github.com/user-attachments/assets/f7d31456-ca73-4f57-b23a-d11d8769357c)
+Because you already download the starburst driver and mount it into /plugins directory in metabase container there will be option for Starburst in the Database Type.
+
+Enter the following information:
+- **Database type:** Select *Starburst* in the dropdown. If this option does not appear, review the [requirements](https://docs.starburst.io/clients/metabase.html#requirements) and make sure you have installed the Starburst driver.
+- **Display name:** A name for this database in Metabase, such as the catalog name and cluster name (free to decide).
+- **Host:** Hostname or IP address of the cluster.
+    You can check your ip database (in this case trino) with this command:
+    docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <_container_name/container_id_>
+- **Port:** Port for the cluster. If the cluster is secured with SSL/TLS, make sure to specify the secure port for that connection. 
+    But for now still cant use SSL/TLS (using port 8443), there are still open issue: [Connect to Trino via certificates · Issue #126 · starburstdata/metabase-driver](https://github.com/starburstdata/metabase-driver/issues/126). So for now just use 8080 (without password)
+- **Catalog:** The name of the catalog to be used for this database. Use iceberg catalog.
+- **Schema (optional):** A schema within the catalog, limiting data to the subset within that schema.
+- **Username:** Username to connect to the cluster.
+- **Password:** Password to connect to the cluster. If the cluster is unsecured, leave this field blank. Because use port 8080, no need to enter a password.
+
+After creating a table in trino, check your trino database in the metabase webserver. If there are no table you need to manual syncing the database first.
+
+- Go to **Admin Settings** → **Databases**.
+- Find your Trino database and click **Sync database schema now**.
+- Wait a few minutes and refresh the table list.
+![Untitled](https://github.com/user-attachments/assets/68708917-e1f6-452a-8cbb-7bbaa4a1a739)
+![image (10)](https://github.com/user-attachments/assets/8a6a36aa-d196-4863-8f69-1ede823d36fc)
+![image (11)](https://github.com/user-attachments/assets/185bab10-6c98-4335-a927-8f00798915d3)
+
+
