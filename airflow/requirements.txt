@@ -1,0 +1,6 @@
+duckdb
+pandas
+minio
+sqlalchemy
+python-dotenv
+pyodbc
