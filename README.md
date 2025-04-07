@@ -28,13 +28,20 @@ After follow several steps from that documentation (add a few lines of config an
 ## dbt
 DBT container likely stops running immediately after starting because it doesn’t have a persistent process keeping it alive. Since dbt is a CLI tool and not a long-running service, the container only runs and then exits unless explicitly kept alive. So it’s a normal thing when you check docker ps and there are no dbt container eventhough you already start your docker compose.
 
-Check if dbt works with trying to extract sql server tables and sink it into iceberg table using dbt:
+Check if dbt works with trying to extract SQL Server tables and sink it into iceberg table using dbt:
 ![image](https://github.com/user-attachments/assets/1fe905e6-6d15-4d5a-86ac-82fd4c9d6ac5)
 ![image (4)](https://github.com/user-attachments/assets/a2c80cef-6f72-4d56-98da-a420f5678454)
 ![image (5)](https://github.com/user-attachments/assets/54dc10c7-76f4-435c-8010-2ac4e03ca8c8)
 
 Check table in DBeaver:
 ![image (6)](https://github.com/user-attachments/assets/dadac6ac-33bb-4ff7-9dae-8868c1947501)
+
+## DuckDB
+Beside using dbt Trino, we can also extract SQL Server table (need to install ODBC Driver for SQL Server) and save it as a file-based format in Minio storage using DuckDB+python.
+![image](https://github.com/user-attachments/assets/7fc081e9-437a-413d-ac93-344f3f5a93af)
+![image](https://github.com/user-attachments/assets/19c0bffc-67cf-49c5-b35a-b59de91c8b63)
+
+
 
 ## Metabase
 ![image (7)](https://github.com/user-attachments/assets/ccc86b7b-2255-47fe-979c-1076d7230de8)
