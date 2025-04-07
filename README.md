@@ -24,3 +24,15 @@ Access minio via web browser: http://localhost:9000
 So you need to follow several steps from this documentation: https://trino.io/docs/current/security/password-file.html
 After follow several steps from that documentation (add a few lines of config and add new https port default is 8443), you can log in to Trino UI with password
 ![image (3)](https://github.com/user-attachments/assets/17d5a6da-39ee-4807-a6fb-836e76237863)
+
+## dbt
+DBT container likely stops running immediately after starting because it doesn’t have a persistent process keeping it alive. Since dbt is a CLI tool and not a long-running service, the container only runs and then exits unless explicitly kept alive. So it’s a normal thing when you check docker ps and there are no dbt container eventhough you already start your docker compose.
+
+Check if dbt works with trying to extract sql server tables and sink it into iceberg table using dbt:
+![image](https://github.com/user-attachments/assets/1fe905e6-6d15-4d5a-86ac-82fd4c9d6ac5)
+![image (4)](https://github.com/user-attachments/assets/a2c80cef-6f72-4d56-98da-a420f5678454)
+![image (5)](https://github.com/user-attachments/assets/54dc10c7-76f4-435c-8010-2ac4e03ca8c8)
+
+Check table in DBeaver:
+![image (6)](https://github.com/user-attachments/assets/dadac6ac-33bb-4ff7-9dae-8868c1947501)
+
