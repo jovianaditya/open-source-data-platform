@@ -1,2 +1,3 @@
-# data-platform
-Open source data platform
+# DataStack-in-a-Box
+DataStack-in-a-Box is a self-managed, on-premise open-source data platform built entirely using Docker. It brings together key components of a modern data stack in a modular and lightweight architecture. The platform uses MinIO as the storage layer, Trino and DuckDB as execution engines, Airflow for orchestration, dbt for transformation, and Metabase for visualization. 
+To support streamlined development and deployment, GitLab is integrated for CI/CD. This project was designed to be scalable, cost-effective, and easily reproducible—ideal for teams or individuals looking to run a complete data platform locally or in a controlled environment without relying on fully managed cloud services.
