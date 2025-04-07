@@ -8,54 +8,54 @@ To support streamlined development and deployment, GitLab is integrated for CI/C
 
 ## Minio
 Minio command:
-- Communicate to minio container : docker exec -it <*container_name*> /bin/bash
-- Make alias to connect into localhost: mc alias set <_alias_name_> [http://localhost:9000](http://localhost:9000/) <access-key> <secret-key>
+- Communicate to minio container: docker exec -it <*container_name*> /bin/bash
+- Make an alias to connect to localhost: mc alias set <_alias_name_> [http://localhost:9000](http://localhost:9000/) <access-key> <secret-key>
 - Show alias that already made: mc alias list
 - Make a bucket inside minio storage: mc mb alias/<bucket-name>
 
-Access minio via web browser: http://localhost:9000
+Access Minio via web browser: http://localhost:9000
 ![image](https://github.com/user-attachments/assets/5ba904d7-d24e-487d-836b-b545f4648288)
 ![image (1)](https://github.com/user-attachments/assets/6a389da8-adac-4f8b-9720-04ea377c2459)
 
 ## Trino
-- Communicate to trino container : docker exec -it <*container_name*> /bin/bash
-- By default when installing trino and setting on specific port (by default port 8080), it will not let you log in with a password.
+- Communicate to trino container: docker exec -it <*container_name*> /bin/bash
+- By default, when installing Trino and setting it on a specific port (by default, port 8080), it will not let you log in with a password.
 ![image (2)](https://github.com/user-attachments/assets/e01f8a24-23c5-4d72-b8c9-db0975243f0d)
 So you need to follow several steps from this documentation: https://trino.io/docs/current/security/password-file.html
-After follow several steps from that documentation (add a few lines of config and add new https port default is 8443), you can log in to Trino UI with password
+After following several steps from that documentation (add a few lines of config and add new https port default is 8443), you can log in to Trino UI with the password
 ![image (3)](https://github.com/user-attachments/assets/17d5a6da-39ee-4807-a6fb-836e76237863)
 
 ## dbt
 DBT container likely stops running immediately after starting because it doesn’t have a persistent process keeping it alive. Since dbt is a CLI tool and not a long-running service, the container only runs and then exits unless explicitly kept alive. So it’s a normal thing when you check docker ps and there are no dbt container eventhough you already start your docker compose.
 
-Check if dbt works with trying to extract SQL Server tables and sink it into iceberg table using dbt:
+Check if dbt works with trying to extract SQL Server tables and sink it into an iceberg table using dbt:
 ![image](https://github.com/user-attachments/assets/1fe905e6-6d15-4d5a-86ac-82fd4c9d6ac5)
 ![image (4)](https://github.com/user-attachments/assets/a2c80cef-6f72-4d56-98da-a420f5678454)
 ![image (5)](https://github.com/user-attachments/assets/54dc10c7-76f4-435c-8010-2ac4e03ca8c8)
 
-Check table in DBeaver:
+Check the table in DBeaver:
 ![image (6)](https://github.com/user-attachments/assets/dadac6ac-33bb-4ff7-9dae-8868c1947501)
 
 ## DuckDB
-Beside using dbt Trino, we can also extract SQL Server table (need to install ODBC Driver for SQL Server) and save it as a file-based format in Minio storage using DuckDB+python.
+Besides using dbt Trino, we can also extract the SQL Server table (need to install ODBC Driver for SQL Server) and save it as a file-based format in Minio storage using DuckDB+python.
 ![image](https://github.com/user-attachments/assets/7fc081e9-437a-413d-ac93-344f3f5a93af)
 ![image](https://github.com/user-attachments/assets/19c0bffc-67cf-49c5-b35a-b59de91c8b63)
 
 ## Airflow
-In this project, I'm trying to implement production scenario using CeleryExecutor airflow instead of Sequential (single node executor). 
+In this project, I'm trying to implement a production scenario using CeleryExecutor airflow instead of Sequential (single node executor). 
 ![image](https://github.com/user-attachments/assets/005d64d1-cb4d-43ef-999e-ef4549a5e08c)
 
 **How It Works (Using CeleryExecutor in Airflow)**
 
 1. The **Airflow Scheduler** assigns tasks to the **CeleryExecutor**.
 2. The **CeleryExecutor** pushes tasks into a queue (e.g., Redis, RabbitMQ).
-3. **Multiple Celery Workers** pick up and execute the tasks in parallel.
+3. **Multiple Celery Workers** Pick up and execute the tasks in parallel.
 4. The workers then report the task status back to Airflow.
 
-**This is a simple DAG, to run my python script that extract sql server table and convert it into parquet using DuckDB**
+**This is a simple DAG, to run my python script that extracts sql server table and converts it into parquet using DuckDB**
 ![image](https://github.com/user-attachments/assets/70f60dc5-f868-459f-9f04-e6f5b3dd7b98)
 
-**Before start your scheduler, you need to add the connection in the Admin section to minio and sql server:**
+**Before you start your scheduler, you need to add the connection in the Admin section to Minio and sql server:**
 ![image](https://github.com/user-attachments/assets/93efe9f7-7ee7-45a3-8c72-9c5fe9647f6e)
 ![image](https://github.com/user-attachments/assets/946dad7d-7426-47bc-a25e-43b45933e395)
 ![image](https://github.com/user-attachments/assets/75d1d236-d986-4324-ba6a-a90391b0743e)
@@ -75,22 +75,22 @@ To connect Metabase to Trino, you need to install Starburst driver first and mou
 
 After running the container, access http://localhost:3000. For the first time, you will need to input several information for Metabase credentials, and then you can add a database connection to the Metabase:
 ![image (8)](https://github.com/user-attachments/assets/f7d31456-ca73-4f57-b23a-d11d8769357c)
-Because you already download the starburst driver and mount it into /plugins directory in metabase container there will be option for Starburst in the Database Type.
+Because you already downloaded the starburst driver and mounted it into /plugins directory in the metabase container, there will be an option for Starburst in the Database Type.
 
 Enter the following information:
 - **Database type:** Select *Starburst* in the dropdown. If this option does not appear, review the [requirements](https://docs.starburst.io/clients/metabase.html#requirements) and make sure you have installed the Starburst driver.
 - **Display name:** A name for this database in Metabase, such as the catalog name and cluster name (free to decide).
 - **Host:** Hostname or IP address of the cluster.
-    You can check your ip database (in this case trino) with this command:
+    You can check your IP database (in this case, Trino) with this command:
     docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <_container_name/container_id_>
 - **Port:** Port for the cluster. If the cluster is secured with SSL/TLS, make sure to specify the secure port for that connection. 
-    But for now still cant use SSL/TLS (using port 8443), there are still open issue: [Connect to Trino via certificates · Issue #126 · starburstdata/metabase-driver](https://github.com/starburstdata/metabase-driver/issues/126). So for now just use 8080 (without password)
-- **Catalog:** The name of the catalog to be used for this database. Use iceberg catalog.
+    But for now, we still can't use SSL/TLS (using port 8443), and there are still open issues: [Connect to Trino via certificates · Issue #126 · starburstdata/metabase-driver](https://github.com/starburstdata/metabase-driver/issues/126). So for now, just use 8080 (without password)
+- **Catalog:** The name of the catalog to be used for this database. Use the iceberg catalog.
 - **Schema (optional):** A schema within the catalog, limiting data to the subset within that schema.
 - **Username:** Username to connect to the cluster.
 - **Password:** Password to connect to the cluster. If the cluster is unsecured, leave this field blank. Because use port 8080, no need to enter a password.
 
-After creating a table in trino, check your trino database in the metabase webserver. If there are no table you need to manual syncing the database first.
+After creating a table in trino, check your trino database in the metabase webserver. If there are no tables, you need to manual syncing the database first.
 
 - Go to **Admin Settings** → **Databases**.
 - Find your Trino database and click **Sync database schema now**.
@@ -98,5 +98,11 @@ After creating a table in trino, check your trino database in the metabase webse
 ![Untitled](https://github.com/user-attachments/assets/68708917-e1f6-452a-8cbb-7bbaa4a1a739)
 ![image (10)](https://github.com/user-attachments/assets/8a6a36aa-d196-4863-8f69-1ede823d36fc)
 ![image (11)](https://github.com/user-attachments/assets/185bab10-6c98-4335-a927-8f00798915d3)
+
+## GitLab
+![image](https://github.com/user-attachments/assets/bafdc35a-0fb1-4ac7-af45-af64d420bcff)
+In the web browser, I’m using external_url = ‘gitlab.local’ to access GitLab instead of "localhost://.....". But before that, there are several steps that must be configured.
+You need to set up some configuration in your host file:
+![image](https://github.com/user-attachments/assets/db87b0b2-dcd9-459d-ad5b-03c24da27e12)
 
 
